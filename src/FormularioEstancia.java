@@ -25,12 +25,12 @@ public class FormularioEstancia extends JDialog {
         panelBusqueda.setBackground(new Color(240, 240, 240));
         JLabel lblBuscar = new JLabel("Buscar mascota:");
         lblBuscar.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        JTextField campoBuscar = new JTextField(20);
-campoBuscar.setFont(new Font("Segoe UI", Font.PLAIN, 20));", Font.BOLD, 20));
+    JTextField campoBuscar = new JTextField(20);
+        campoBuscar.setFont(new Font("Segoe UI", Font.PLAIN, 20));
+         campoBuscar.setFont(new Font("Segoe UI", Font.PLAIN, 20));
         comboMascota = new JComboBox<>();
-        comboMascota.setFont(new Font("Segoe UI", Font.PLAIN,20;
+        comboMascota.setFont(new Font("Segoe UI", Font.PLAIN, 20));
         cargarMascotas("");
-
         campoBuscar.getDocument().addDocumentListener(new SimpleDocListener() {
             public void update() {
                 cargarMascotas(campoBuscar.getText().trim());
