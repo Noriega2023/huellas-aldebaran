@@ -6,7 +6,7 @@ import java.util.List;
 
 public class DuenoDAO {
 
-    private List<Dueno> listaDuenos;
+    
 
     public static void insertar(Dueno dueno) {
         String sql = "INSERT INTO duenos (nombre, telefono, email) VALUES (?, ?, ?)";
@@ -74,8 +74,33 @@ public class DuenoDAO {
         }
     }
 
+       /**
+     * Busca un dueño por su identificador directamente en la base de datos.
+     *
+     * Este método evita cargar todos los dueños en memoria y realiza una
+     * consulta parametrizada para encontrar el registro deseado. Devuelve
+     * {@code null} si no existe ningún dueño con el ID especificado.
+     *
+     * @param id Identificador del dueño a buscar.
+     * @return Una instancia de {@link Dueno} o {@code null} si no se encuentra.
+     */
     public static Dueno buscarPorId(int id) {
-        return listar().stream()
-                .filter(d -> d.getId() == id).findFirst().orElse(null);
+        String sql = "SELECT * FROM duenos WHERE id = ?";
+        try (Connection conn = DB.conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Dueno(
+                            rs.getInt("id"),
+                            rs.getString("nombre"),
+                            rs.getString("telefono"),
+                            rs.getString("email")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
-}
