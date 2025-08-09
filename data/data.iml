@@ -26,7 +26,6 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="LGoodDatePicker-11.2.2" level="project" />
     <orderEntry type="library" name="sqlite-jdbc-3.49.1.0" level="project" />
     <orderEntry type="library" name="sqlite-jdbc-3.49.1.1" level="project" />
     <orderEntry type="library" name="LGoodDatePicker-11.2.3" level="project" />
