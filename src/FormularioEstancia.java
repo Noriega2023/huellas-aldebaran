@@ -24,11 +24,11 @@ public class FormularioEstancia extends JDialog {
         JPanel panelBusqueda = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
         panelBusqueda.setBackground(new Color(240, 240, 240));
         JLabel lblBuscar = new JLabel("Buscar mascota:");
-        lblBuscar.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        lblBuscar.setFont(new Font("Segoe UI", Font.BOLD, 20));
         JTextField campoBuscar = new JTextField(20);
-        campoBuscar.setFont(new Font("Segoe UI", Font.PLAIN, 18));
+        campo        lbBuscar.setFont(new Font("Segoe UI", Font.BOLD, 20));
         comboMascota = new JComboBox<>();
-        comboMascota.setFont(new Font("Segoe UI", Font.PLAIN, 18));
+        comboMascota.setFont(new Font("Segoe UI", Font.PLAIN,2018));
         cargarMascotas("");
 
         campoBuscar.getDocument().addDocumentListener(new SimpleDocListener() {
@@ -50,14 +50,15 @@ public class FormularioEstancia extends JDialog {
         gbc.insets = new Insets(12,12,12,12);
         gbc.anchor = GridBagConstraints.WEST;
 
-        Font fuenteLabel = new Font("Segoe UI", Font.BOLD, 18);
-        Font fuenteCampo = new Font("Segoe UI", Font.PLAIN, 18);
+           Font fuenteLabel = new Font("Segoe UI", Font.BOLD, 20);
+           Font fuenteCampo = new Font("Segoe UI", Font.PLAIN, 20);
 
         // Fechas
         DatePickerSettings settingsIngreso = new DatePickerSettings();
         settingsIngreso.setAllowEmptyDates(false);
         settingsIngreso.setFormatForDatesCommonEra("dd/MM/yyyy");
         dateIngreso = new DatePicker(settingsIngreso);
+              settingsIngreso.setFontValidDate(new Font("Segoe UI", Font.PLAIN, 20));
         dateIngreso.setFont(fuenteCampo);
         dateIngreso.setPreferredSize(new Dimension(250, 40));
 
@@ -98,7 +99,7 @@ public class FormularioEstancia extends JDialog {
 
         // Botón inferior
         JButton btnIngreso = new JButton("Registrar Estancia");
-        btnIngreso.setFont(new Font("Segoe UI", Font.BOLD, 18));
+           btnIngreso.setFont(new Font("Segoe UI", Font.BOLD, 20));
         btnIngreso.setBackground(new Color(70, 130, 180));
         btnIngreso.setForeground(Color.WHITE);
         btnIngreso.setFocusPainted(false);
@@ -106,9 +107,11 @@ public class FormularioEstancia extends JDialog {
         btnIngreso.addActionListener(e -> guardarEstancia());
 
         JPanel panelBot = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 20));
-        panelBot.setBackground(new Color(240,240,240));
+        panelBot.setBackground(new Color(240,240,24020
         panelBot.add(btnIngreso);
         add(panelBot, BorderLayout.SOUTH);
+                pack();
+           setMinimumSize(getPreferredSize());
     }
 
     private void cargarMascotas(String filtro) {
