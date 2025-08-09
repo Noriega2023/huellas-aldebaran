@@ -26,9 +26,9 @@ public class FormularioEstancia extends JDialog {
         JLabel lblBuscar = new JLabel("Buscar mascota:");
         lblBuscar.setFont(new Font("Segoe UI", Font.BOLD, 20));
         JTextField campoBuscar = new JTextField(20);
-        campo        lbBuscar.setFont(new Font("Segoe UI", Font.BOLD, 20));
+campoBuscar.setFont(new Font("Segoe UI", Font.PLAIN, 20));", Font.BOLD, 20));
         comboMascota = new JComboBox<>();
-        comboMascota.setFont(new Font("Segoe UI", Font.PLAIN,2018));
+        comboMascota.setFont(new Font("Segoe UI", Font.PLAIN,20;
         cargarMascotas("");
 
         campoBuscar.getDocument().addDocumentListener(new SimpleDocListener() {
@@ -107,7 +107,7 @@ public class FormularioEstancia extends JDialog {
         btnIngreso.addActionListener(e -> guardarEstancia());
 
         JPanel panelBot = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 20));
-        panelBot.setBackground(new Color(240,240,24020
+panelBot.setBackground(new Color(240, 240, 240));
         panelBot.add(btnIngreso);
         add(panelBot, BorderLayout.SOUTH);
                 pack();
@@ -122,7 +122,7 @@ public class FormularioEstancia extends JDialog {
         for (Mascota m : lista) {
             // Verificar si la mascota ya está en una estancia activa
             boolean enEstancia = Datos.estancias.stream()
-                    .anyMatch(e -> e.getMascotaId() == m.getId() &&
+
                             !hoy.isBefore(e.getFechaIngreso()) &&
                             !hoy.isAfter(e.getFechaSalida()));
 
