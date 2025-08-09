@@ -138,28 +138,102 @@ public class FormularioEstancia extends JDialog {
                     JOptionPane.INFORMATION_MESSAGE);
         }
     }
-
+    /**
+     * Guarda una nueva estancia en la base de datos y actualiza la lista en memoria.
+     *
+     * Este método valida que exista una mascota seleccionada, que las fechas de
+     * ingreso y salida sean válidas y que el precio por día sea un número. También
+     * comprueba que la mascota no tenga otra estancia activa que se solape con
+     * el rango de fechas propuesto. Si todas las validaciones se cumplen, se
+     * crea un nuevo objeto {@link Estancia}, se inserta mediante {@link EstanciaDAO}
+     * y se añade a la lista estática {@link Datos#estancias}. Finalmente se
+     * muestra un mensaje de éxito al usuario y se cierra el diálogo.
+     */
     private void guardarEstancia() {
         try {
+            // Validar que haya una mascota seleccionada
             Mascota mascota = (Mascota) comboMascota.getSelectedItem();
-            // ... resto del código existente ...
-
-            // Esta validación ya no sería necesaria técnicamente, pero es buena práctica mantenerla
-            if (estaMascotaEnEstanciaActiva(mascota.getId())) {
+            if (mascota == null) {
                 JOptionPane.showMessageDialog(this,
-                        "Error: La mascota seleccionada ya está en una estancia activa.\n" +
-                                "Por favor, actualiza la lista de mascotas.",
-                        "Conflicto de estancia",
+                        "Debe seleccionar una mascota",
+                        "Mascota no seleccionada",
                         JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            // ... resto del código existente ...
+            // Obtener fechas del selector de fechas
+            LocalDate fechaIngreso = dateIngreso.getDate();
+            LocalDate fechaSalida = dateSalida.getDate();
+            if (fechaIngreso == null || fechaSalida == null) {
+                JOptionPane.showMessageDialog(this,
+                        "Debes seleccionar las fechas de ingreso y salida",
+                        "Fechas faltantes",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            if (fechaIngreso.isAfter(fechaSalida)) {
+                JOptionPane.showMessageDialog(this,
+                        "La fecha de ingreso no puede ser posterior a la fecha de salida",
+                        "Fechas inválidas",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Validar y convertir el precio por día
+            String precioTexto = campoPrecioDia.getText().trim();
+            if (precioTexto.isEmpty()) {
+                JOptionPane.showMessageDialog(this,
+                        "Debe introducir el precio por día",
+                        "Precio faltante",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            double precio;
+            try {
+                precio = Double.parseDouble(precioTexto);
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this,
+                        "El precio debe ser un número válido",
+                        "Precio inválido",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            // Estado de pago
+            boolean pagado = checkPagado.isSelected();
+
+            // Comprobar si la mascota ya tiene una estancia que se solape con las fechas ingresadas
+            for (Estancia e : Datos.estancias) {
+                if (e.getMascotaId() == mascota.getId()) {
+                    // Verificar solapamiento: nuevo intervalo se solapa si su inicio es antes
+                    // o igual al final existente y su fin es después o igual al inicio existente
+                    if (!fechaIngreso.isAfter(e.getFechaSalida()) && !fechaSalida.isBefore(e.getFechaIngreso())) {
+                        JOptionPane.showMessageDialog(this,
+                                "La mascota seleccionada ya tiene una estancia que se solapa con las fechas seleccionadas.",
+                                "Conflicto de estancia",
+                                JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                }
+            }
+
+            // Crear y persistir la nueva estancia
+            Estancia nueva = new Estancia(mascota.getId(), fechaIngreso, fechaSalida, precio, pagado);
+            EstanciaDAO.insertar(nueva);
+            Datos.estancias.add(nueva);
+
+            JOptionPane.showMessageDialog(this,
+                    "Estancia guardada con éxito",
+                    "Operación exitosa",
+                    JOptionPane.INFORMATION_MESSAGE);
+            dispose();
         } catch (Exception ex) {
-            // ... manejo de errores existente ...
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this,
+                    "Se produjo un error al guardar la estancia: " + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
-
     // Método para verificar si la mascota ya está en una estancia activa
     private boolean estaMascotaEnEstanciaActiva(int mascotaId) {
         LocalDate hoy = LocalDate.now();
