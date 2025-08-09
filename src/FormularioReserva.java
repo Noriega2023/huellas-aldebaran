@@ -29,8 +29,8 @@ public class FormularioReserva extends JDialog {
         gbc.insets = new Insets(12, 12, 12, 12);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        Font fontLabel = new Font("Segoe UI", Font.BOLD, 18);
-        Font fontField = new Font("Segoe UI", Font.PLAIN, 18);
+        Font fontLabel = new Font("Segoe UI", Font.BOLD, 20
+        Font fontField = new Font("Segoe UI", Font.PLAIN, 20);
 
         // Fila 0: buscador mascotas
         gbc.gridx = 0; gbc.gridy = 0;
@@ -113,6 +113,8 @@ public class FormularioReserva extends JDialog {
         });
         btnLimpiar.addActionListener(e -> limpiarCampos());
         btnGuardar.addActionListener(e -> guardarReserva());
+                pack();
+setMinimumSize(getPreferredSize());
     }
 
     private GridBagConstraints nextCell(GridBagConstraints gbc) {
@@ -127,15 +129,15 @@ public class FormularioReserva extends JDialog {
         s.setFormatForDatesCommonEra("dd/MM/yyyy");
 
         // Configuración de tamaño aumentado
-        s.setFontCalendarDateLabels(new Font("Segoe UI", Font.PLAIN, 16)); // Tamaño de fuente aumentado
-        s.setFontValidDate(new Font("Segoe UI", Font.PLAIN, 16));
+             s.setFontCalendarDateLabels(new Font("Segoe UI", Font.PLAIN, 20));
+        s.setFontValidDate(new Font("Segoe UI", Font.PLAIN, 20));
         s.setSizeTextFieldMinimumWidth(Integer.valueOf(150)); // Ancho mínimo del campo de texto
 
         DatePicker picker = new DatePicker(s);
 
         // Aumentar tamaño del botón del calendario
         picker.getComponentToggleCalendarButton().setPreferredSize(new Dimension(40, 40));
-        picker.getComponentToggleCalendarButton().setFont(new Font("Segoe UI", Font.PLAIN, 18));
+        picker.getComponentToggleCalendarButton().setFont(new Font("Segoe UI", Font.PLAIN, 20
 
         // Aumentar tamaño del panel principal
         picker.setPreferredSize(new Dimension(250, 45));
