@@ -55,41 +55,10 @@ public class MascotaDAO {
         return res;
     }
 
-      /**
-     * Busca una mascota por su identificador directamente en la base de datos.
-     *
-     * Este método ejecuta una consulta SQL para obtener una única mascota y así
-     * evita iterar sobre todas las mascotas cargadas. Si no se encuentra la
-     * mascota solicitada, devuelve {@code null}.
-     *
-     * @param id Identificador de la mascota a buscar.
-     * @return Instancia de {@link Mascota} o {@code null} si no existe.
-     */
     public static Mascota buscarPorId(int id) {
-        String sql = "SELECT * FROM mascotas WHERE id = ?";
-        try (Connection conn = DB.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, id);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    Dueno dueno = DuenoDAO.buscarPorId(rs.getInt("dueno_id"));
-                    return new Mascota(
-                            rs.getInt("id"),
-                            rs.getString("nombre"),
-                            rs.getString("raza"),
-                            rs.getDouble("edad"),
-                            rs.getString("observaciones"),
-                            dueno,
-                            rs.getObject("peso") != null ? rs.getDouble("peso") : null
-                    );
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-    
+        return listarTodos().stream()
+                .filter(m -> m.getId() == id)
+                .findFirst().orElse(null);
     }
 
     public static List<Mascota> listarTodos() {
