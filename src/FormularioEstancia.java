@@ -7,6 +7,13 @@ import java.awt.*;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Diálogo para registrar una estancia en la residencia canina.
+ * <p>
+ * Permite seleccionar una mascota disponible, establecer las fechas de ingreso y salida,
+ * indicar el precio por día y si la estancia ha sido pagada. El formulario valida los
+ * campos introducidos y evita que se creen estancias solapadas para la misma mascota.
+ */
 public class FormularioEstancia extends JDialog {
     private JComboBox<Mascota> comboMascota;
     private DatePicker dateIngreso, dateSalida;
@@ -25,12 +32,12 @@ public class FormularioEstancia extends JDialog {
         panelBusqueda.setBackground(new Color(240, 240, 240));
         JLabel lblBuscar = new JLabel("Buscar mascota:");
         lblBuscar.setFont(new Font("Segoe UI", Font.BOLD, 20));
-    JTextField campoBuscar = new JTextField(20);
+        JTextField campoBuscar = new JTextField(20);
         campoBuscar.setFont(new Font("Segoe UI", Font.PLAIN, 20));
-         campoBuscar.setFont(new Font("Segoe UI", Font.PLAIN, 20));
         comboMascota = new JComboBox<>();
         comboMascota.setFont(new Font("Segoe UI", Font.PLAIN, 20));
         cargarMascotas("");
+
         campoBuscar.getDocument().addDocumentListener(new SimpleDocListener() {
             public void update() {
                 cargarMascotas(campoBuscar.getText().trim());
@@ -44,37 +51,44 @@ public class FormularioEstancia extends JDialog {
 
         // Panel central: formulario
         JPanel panelC = new JPanel(new GridBagLayout());
-        panelC.setBackground(new Color(240,240,240));
+        panelC.setBackground(new Color(240, 240, 240));
         panelC.setBorder(new EmptyBorder(20, 80, 20, 80));
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(12,12,12,12);
+        gbc.insets = new Insets(12, 12, 12, 12);
         gbc.anchor = GridBagConstraints.WEST;
 
-           Font fuenteLabel = new Font("Segoe UI", Font.BOLD, 20);
-           Font fuenteCampo = new Font("Segoe UI", Font.PLAIN, 20);
+        // Unificar tamaños de fuente en todo el formulario (20 pt)
+        Font fuenteLabel = new Font("Segoe UI", Font.BOLD, 20);
+        Font fuenteCampo = new Font("Segoe UI", Font.PLAIN, 20);
 
         // Fechas
         DatePickerSettings settingsIngreso = new DatePickerSettings();
         settingsIngreso.setAllowEmptyDates(false);
         settingsIngreso.setFormatForDatesCommonEra("dd/MM/yyyy");
+        // Ajustar fuentes internas del calendario al mismo tamaño
+        settingsIngreso.setFontCalendarDateLabels(fuenteCampo);
+        settingsIngreso.setFontValidDate(fuenteCampo);
         dateIngreso = new DatePicker(settingsIngreso);
-              settingsIngreso.setFontValidDate(new Font("Segoe UI", Font.PLAIN, 20));
         dateIngreso.setFont(fuenteCampo);
         dateIngreso.setPreferredSize(new Dimension(250, 40));
 
         DatePickerSettings settingsSalida = new DatePickerSettings();
         settingsSalida.setAllowEmptyDates(false);
         settingsSalida.setFormatForDatesCommonEra("dd/MM/yyyy");
+        settingsSalida.setFontCalendarDateLabels(fuenteCampo);
+        settingsSalida.setFontValidDate(fuenteCampo);
         dateSalida = new DatePicker(settingsSalida);
         dateSalida.setFont(fuenteCampo);
         dateSalida.setPreferredSize(new Dimension(250, 40));
 
-        gbc.gridx = 0; gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
         panelC.add(new JLabel("Fecha ingreso:"), gbc);
         gbc.gridx = 1;
         panelC.add(dateIngreso, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 1;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
         panelC.add(new JLabel("Fecha salida:"), gbc);
         gbc.gridx = 1;
         panelC.add(dateSalida, gbc);
@@ -87,19 +101,21 @@ public class FormularioEstancia extends JDialog {
         checkPagado = new JCheckBox("Pagado");
         checkPagado.setFont(fuenteLabel);
 
-        gbc.gridx = 0; gbc.gridy = 2;
+        gbc.gridx = 0;
+        gbc.gridy = 2;
         panelC.add(new JLabel("Precio por día (€):"), gbc);
         gbc.gridx = 1;
         panelC.add(campoPrecioDia, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 3;
+        gbc.gridx = 0;
+        gbc.gridy = 3;
         panelC.add(checkPagado, gbc);
 
         add(panelC, BorderLayout.CENTER);
 
         // Botón inferior
         JButton btnIngreso = new JButton("Registrar Estancia");
-           btnIngreso.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        btnIngreso.setFont(fuenteLabel);
         btnIngreso.setBackground(new Color(70, 130, 180));
         btnIngreso.setForeground(Color.WHITE);
         btnIngreso.setFocusPainted(false);
@@ -107,13 +123,21 @@ public class FormularioEstancia extends JDialog {
         btnIngreso.addActionListener(e -> guardarEstancia());
 
         JPanel panelBot = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 20));
-panelBot.setBackground(new Color(240, 240, 240));
+        panelBot.setBackground(new Color(240, 240, 240));
         panelBot.add(btnIngreso);
         add(panelBot, BorderLayout.SOUTH);
-                pack();
-           setMinimumSize(getPreferredSize());
+
+        // Ajustar tamaño y comportamiento de la ventana para que conserve la estructura al redimensionar
+        pack();
+        setMinimumSize(getPreferredSize());
     }
 
+    /**
+     * Carga las mascotas disponibles en el combo, aplicando un filtro por nombre y
+     * descartando aquellas que ya tengan una estancia activa en la fecha actual.
+     *
+     * @param filtro Texto por el que filtrar el nombre de las mascotas
+     */
     private void cargarMascotas(String filtro) {
         comboMascota.removeAllItems();
         List<Mascota> lista = MascotaDAO.listarTodos();
@@ -121,10 +145,10 @@ panelBot.setBackground(new Color(240, 240, 240));
 
         for (Mascota m : lista) {
             // Verificar si la mascota ya está en una estancia activa
-            boolean enEstancia = Datos.estancias.stream();
-
-                            !hoy.isBefore(e.getFechaIngreso()) &&
-                            !hoy.isAfter(e.getFechaSalida();
+            boolean enEstancia = Datos.estancias.stream()
+                    .anyMatch(e -> e.getMascotaId() == m.getId()
+                            && !hoy.isBefore(e.getFechaIngreso())
+                            && !hoy.isAfter(e.getFechaSalida()));
 
             // Solo agregar si cumple el filtro y NO está en estancia
             if (!enEstancia && (filtro.isEmpty() || m.getNombre().toLowerCase().contains(filtro.toLowerCase()))) {
@@ -141,9 +165,10 @@ panelBot.setBackground(new Color(240, 240, 240));
                     JOptionPane.INFORMATION_MESSAGE);
         }
     }
+
     /**
      * Guarda una nueva estancia en la base de datos y actualiza la lista en memoria.
-     *
+     * <p>
      * Este método valida que exista una mascota seleccionada, que las fechas de
      * ingreso y salida sean válidas y que el precio por día sea un número. También
      * comprueba que la mascota no tenga otra estancia activa que se solape con
@@ -201,14 +226,11 @@ panelBot.setBackground(new Color(240, 240, 240));
                         JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            // Estado de pago
             boolean pagado = checkPagado.isSelected();
 
             // Comprobar si la mascota ya tiene una estancia que se solape con las fechas ingresadas
             for (Estancia e : Datos.estancias) {
                 if (e.getMascotaId() == mascota.getId()) {
-                    // Verificar solapamiento: nuevo intervalo se solapa si su inicio es antes
-                    // o igual al final existente y su fin es después o igual al inicio existente
                     if (!fechaIngreso.isAfter(e.getFechaSalida()) && !fechaSalida.isBefore(e.getFechaIngreso())) {
                         JOptionPane.showMessageDialog(this,
                                 "La mascota seleccionada ya tiene una estancia que se solapa con las fechas seleccionadas.",
@@ -237,6 +259,7 @@ panelBot.setBackground(new Color(240, 240, 240));
                     JOptionPane.ERROR_MESSAGE);
         }
     }
+
     // Método para verificar si la mascota ya está en una estancia activa
     private boolean estaMascotaEnEstanciaActiva(int mascotaId) {
         LocalDate hoy = LocalDate.now();
