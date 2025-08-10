@@ -14,18 +14,28 @@ public class SalidaEstancia extends JDialog {
 
     public SalidaEstancia(JFrame parent) {
         super(parent, "Gestión de Salidas", true);
-        setSize(800, 600);
+        // Ajustamos la ventana al finalizar la construcción con pack() para que se
+        // ajuste al contenido. No establecemos un tamaño fijo para permitir el
+        // redimensionado adecuado.
         setLocationRelativeTo(parent);
         setLayout(new BorderLayout(15, 15));
+        // Color de fondo claro y uniforme para todo el diálogo.
         getContentPane().setBackground(new Color(240, 240, 240));
 
-        // Panel principal
-        JPanel panel = new JPanel(new GridLayout(5, 2, 15,15));
-        panel.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
-        panel.setBackground(new Color(240,240,240));
+        // Panel principal con GridBagLayout para un mejor posicionamiento y para
+        // centrar los componentes. Separamos las etiquetas a la izquierda y los
+        // campos a la derecha.
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
+        panel.setBackground(new Color(240, 240, 240));
 
+        // Fuentes coherentes con el resto de interfaces (20 puntos)
+        Font fuenteEtiqueta = new Font("Segoe UI", Font.BOLD, 20);
+        Font fuenteCampo   = new Font("Segoe UI", Font.PLAIN, 20);
+
+        // Componentes de selección y entrada
         comboEstancia = new JComboBox<>(Datos.estancias.toArray(new Estancia[0]));
-        comboEstancia.setFont(new Font("Segoe UI", Font.PLAIN, 18));
+        comboEstancia.setFont(fuenteCampo);
         comboEstancia.addItemListener(e -> actualizarInfoEstancia());
 
         DatePickerSettings settings = new DatePickerSettings();
@@ -33,29 +43,66 @@ public class SalidaEstancia extends JDialog {
         settings.setFormatForDatesCommonEra("dd/MM/yyyy");
 
         dateNuevaSalida = new DatePicker(settings);
-        dateNuevaSalida.setFont(new Font("Segoe UI", Font.PLAIN, 18));
+        dateNuevaSalida.setFont(fuenteCampo);
         dateNuevaSalida.setPreferredSize(new Dimension(250, 40));
 
-        labelImporte = new JLabel("Total a pagar: €0.00");
-        labelImporte.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        // Etiquetas de importe y detalles
+        labelImporte = new JLabel("Total a pagar: €0,00");
+        labelImporte.setFont(fuenteEtiqueta);
 
         infoEstancia = new JLabel(" ");
-        infoEstancia.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        infoEstancia.setFont(fuenteCampo);
         infoEstancia.setVerticalAlignment(SwingConstants.TOP);
 
-        panel.add(new JLabel("Mascota:", JLabel.RIGHT)); panel.add(comboEstancia);
-        panel.add(new JLabel("Nueva fecha de salida:", JLabel.RIGHT)); panel.add(dateNuevaSalida);
-        panel.add(new JLabel("Detalles:", JLabel.RIGHT)); panel.add(infoEstancia);
-        panel.add(new JLabel("Importe:", JLabel.RIGHT)); panel.add(labelImporte);
+        // Configuramos GridBagConstraints para distribuir las filas y columnas
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.NONE;
 
-        // Botones
-        JPanel botones = new JPanel(new FlowLayout(FlowLayout.CENTER, 15,10));
-        botones.setBackground(new Color(240,240,240));
+        // Fila 0: Mascota
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.EAST;
+        panel.add(crearEtiqueta("Mascota:", fuenteEtiqueta), gbc);
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        panel.add(comboEstancia, gbc);
 
-        JButton btnSalida = crearBoton("Dar salida hoy", new Color(200,50,50));
-        JButton btnActualizar = crearBoton("Actualizar fecha", new Color(70,130,180));
-        JButton btnCalcular = crearBoton("Calcular importe", new Color(60,179,113));
-        JButton btnCerrar = crearBoton("Cerrar", new Color(100,100,100));
+        // Fila 1: Nueva fecha de salida
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.anchor = GridBagConstraints.EAST;
+        panel.add(crearEtiqueta("Nueva fecha de salida:", fuenteEtiqueta), gbc);
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        panel.add(dateNuevaSalida, gbc);
+
+        // Fila 2: Detalles (alineado arriba a la derecha para el texto multilínea)
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.anchor = GridBagConstraints.NORTHEAST;
+        panel.add(crearEtiqueta("Detalles:", fuenteEtiqueta), gbc);
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        panel.add(infoEstancia, gbc);
+
+        // Fila 3: Importe
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.anchor = GridBagConstraints.EAST;
+        panel.add(crearEtiqueta("Importe:", fuenteEtiqueta), gbc);
+        gbc.gridx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        panel.add(labelImporte, gbc);
+
+        // Panel de botones con FlowLayout centrado
+        JPanel botones = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        botones.setBackground(new Color(240, 240, 240));
+
+        JButton btnSalida     = crearBoton("Dar salida hoy", new Color(200, 50, 50));
+        JButton btnActualizar = crearBoton("Actualizar fecha", new Color(70, 130, 180));
+        JButton btnCalcular   = crearBoton("Calcular importe", new Color(60, 179, 113));
+        JButton btnCerrar     = crearBoton("Cerrar", new Color(100, 100, 100));
 
         btnSalida.addActionListener(e -> darSalida());
         btnActualizar.addActionListener(e -> actualizarFecha());
@@ -67,10 +114,17 @@ public class SalidaEstancia extends JDialog {
         botones.add(btnCalcular);
         botones.add(btnCerrar);
 
+        // Añadimos paneles al diálogo
         add(panel, BorderLayout.CENTER);
         add(botones, BorderLayout.SOUTH);
 
+        // Actualizamos la información de la estancia seleccionada
         actualizarInfoEstancia();
+
+        // Ajustamos el tamaño y establecemos el tamaño mínimo para conservar la
+        // estructura al redimensionar
+        pack();
+        setMinimumSize(getPreferredSize());
     }
 
     private JButton crearBoton(String texto, Color color) {
@@ -169,5 +223,22 @@ public class SalidaEstancia extends JDialog {
             infoEstancia.setText(" ");
             labelImporte.setText("Total a pagar: €0.00");
 
+    }
+
+    /**
+     * Crea una etiqueta con la fuente indicada y alineación a la derecha.
+     * Este método simplifica la creación de las etiquetas del formulario,
+     * garantizando que todas utilicen las mismas propiedades de fuente y
+     * alineación.
+     *
+     * @param texto  El texto que mostrará la etiqueta.
+     * @param fuente La fuente a aplicar.
+     * @return JLabel configurado.
+     */
+    private JLabel crearEtiqueta(String texto, Font fuente) {
+        JLabel etiqueta = new JLabel(texto);
+        etiqueta.setFont(fuente);
+        etiqueta.setHorizontalAlignment(SwingConstants.RIGHT);
+        return etiqueta;
     }
 }
