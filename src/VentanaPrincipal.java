@@ -158,8 +158,8 @@ public class VentanaPrincipal extends JFrame {
             g.drawImage(fondo, 0, 0, getWidth(), getHeight(), this);
 
             // Capa semitransparente solo en la parte inferior
-            g.setColor(new Color(255, 255, 255, 180));
-            g.fillRect(0, getHeight()/2, getWidth(), getHeight()/2);
+//            g.setColor(new Color(255, 255, 255, 180));
+//            g.fillRect(0, getHeight()/2, getWidth(), getHeight()/2);
         }
     }
 
