@@ -137,8 +137,12 @@ public class VistaEstancias extends JDialog {
         // Conjunto para evitar duplicar mascotas en estancias activas
         java.util.Set<Integer> mascotasOcupadas = new java.util.HashSet<>();
         for (Estancia e : Datos.estancias) {
-            // Incluir solamente si la estancia está activa hoy, no está pagada y la mascota aún no ha sido añadida
-            if (!e.isPagado() && !hoy.isBefore(e.getFechaIngreso()) && !hoy.isAfter(e.getFechaSalida())) {
+            // Incluir la estancia si está activa hoy de forma estricta (desde el ingreso inclusive hasta
+            // la salida exclusiva), no está pagada y la mascota aún no ha sido añadida. Con esto, una estancia
+            // finalizada hoy desaparece inmediatamente de la vista.
+            if (!e.isPagado()
+                    && !hoy.isBefore(e.getFechaIngreso())
+                    && hoy.isBefore(e.getFechaSalida())) {
                 if (!mascotasOcupadas.contains(e.getMascotaId())) {
                     hoyActivas.add(e);
                     mascotasOcupadas.add(e.getMascotaId());

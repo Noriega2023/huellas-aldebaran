@@ -144,12 +144,15 @@ public class FormularioEstancia extends JDialog {
         LocalDate hoy = LocalDate.now();
 
         for (Mascota m : lista) {
-            // Verificar si la mascota ya está en una estancia activa (no pagada)
+            // Verificar si la mascota ya está en una estancia activa (no pagada).
+            // Consideramos activa sólo si la fecha actual está dentro del rango de la estancia de forma estricta
+            // (desde la fecha de ingreso inclusive hasta la fecha de salida exclusiva). De este modo, si una
+            // estancia finaliza hoy, la mascota queda disponible inmediatamente para una nueva estancia.
             boolean enEstancia = Datos.estancias.stream()
                     .anyMatch(e -> e.getMascotaId() == m.getId()
                             && !e.isPagado()
                             && !hoy.isBefore(e.getFechaIngreso())
-                            && !hoy.isAfter(e.getFechaSalida()));
+                            && hoy.isBefore(e.getFechaSalida()));
 
             // Solo agregar si cumple el filtro y NO está en estancia activa
             if (!enEstancia && (filtro.isEmpty() || m.getNombre().toLowerCase().contains(filtro.toLowerCase()))) {
@@ -229,10 +232,16 @@ public class FormularioEstancia extends JDialog {
             }
             boolean pagado = checkPagado.isSelected();
 
-            // Comprobar si la mascota ya tiene una estancia que se solape con las fechas ingresadas
+            // Comprobar si la mascota ya tiene una estancia que se solape con las fechas ingresadas.
+            // Ignoramos estancias que estén pagadas (finalizadas). Para determinar si hay solapamiento,
+            // utilizamos comparaciones estrictas: las fechas se consideran solapadas únicamente si
+            // la fecha de ingreso propuesta es estrictamente anterior a la fecha de salida existente y
+            // la fecha de salida propuesta es estrictamente posterior a la fecha de ingreso existente.
             for (Estancia e : Datos.estancias) {
-                if (e.getMascotaId() == mascota.getId()) {
-                    if (!fechaIngreso.isAfter(e.getFechaSalida()) && !fechaSalida.isBefore(e.getFechaIngreso())) {
+                // Ignorar estancias finalizadas
+                if (e.getMascotaId() == mascota.getId() && !e.isPagado()) {
+                    // Si las fechas se solapan con alguna estancia no pagada, mostrar error
+                    if (fechaIngreso.isBefore(e.getFechaSalida()) && fechaSalida.isAfter(e.getFechaIngreso())) {
                         JOptionPane.showMessageDialog(this,
                                 "La mascota seleccionada ya tiene una estancia que se solapa con las fechas seleccionadas.",
                                 "Conflicto de estancia",
@@ -264,11 +273,10 @@ public class FormularioEstancia extends JDialog {
     // Método para verificar si la mascota ya está en una estancia activa
     private boolean estaMascotaEnEstanciaActiva(int mascotaId) {
         LocalDate hoy = LocalDate.now();
-
         for (Estancia estancia : Datos.estancias) {
-            if (estancia.getMascotaId() == mascotaId) {
-                // Verificar si las fechas de la estancia existente se solapan con hoy
-                if (!hoy.isBefore(estancia.getFechaIngreso()) && !hoy.isAfter(estancia.getFechaSalida())) {
+            if (estancia.getMascotaId() == mascotaId && !estancia.isPagado()) {
+                // La estancia está activa si hoy está dentro del intervalo [fechaIngreso, fechaSalida)
+                if (!hoy.isBefore(estancia.getFechaIngreso()) && hoy.isBefore(estancia.getFechaSalida())) {
                     return true;
                 }
             }

@@ -38,8 +38,10 @@ public class SalidaEstancia extends JDialog {
         Font fuenteCampo   = new Font("Segoe UI", Font.PLAIN, 20);
 
         // Componentes de selección y entrada
-        comboEstancia = new JComboBox<>(Datos.estancias.toArray(new Estancia[0]));
+        // Construimos el combo con las estancias activas (no pagadas y con fecha de salida en el futuro)
+        comboEstancia = new JComboBox<>();
         comboEstancia.setFont(fuenteCampo);
+        cargarEstanciasActivasEnCombo();
         comboEstancia.addItemListener(e -> actualizarInfoEstancia());
 
         DatePickerSettings settings = new DatePickerSettings();
@@ -210,6 +212,35 @@ public class SalidaEstancia extends JDialog {
         labelImporte.setText(String.format("Total a pagar: €%.2f", dias * e.getPrecioDia()));
     }
 
+    /**
+     * Rellena el combo de estancias con aquellas que están activas en la fecha de hoy. Una estancia
+     * se considera activa si no está pagada y el día actual está entre la fecha de ingreso
+     * (incluida) y la fecha de salida (excluida). También se evita añadir más de una estancia
+     * por mascota para no mostrar duplicados si existieran entradas repetidas en memoria.
+     */
+    private void cargarEstanciasActivasEnCombo() {
+        if (comboEstancia == null) return;
+        LocalDate hoy = LocalDate.now();
+        java.util.Set<Integer> mascotasAñadidas = new java.util.HashSet<>();
+        java.util.List<Estancia> activas = new java.util.ArrayList<>();
+        for (Estancia e : Datos.estancias) {
+            if (!e.isPagado()
+                    && !hoy.isBefore(e.getFechaIngreso())
+                    && hoy.isBefore(e.getFechaSalida())) {
+                // Evitar duplicados por mascota
+                if (mascotasAñadidas.add(e.getMascotaId())) {
+                    activas.add(e);
+                }
+            }
+        }
+        DefaultComboBoxModel<Estancia> modelo = new DefaultComboBoxModel<>(activas.toArray(new Estancia[0]));
+        comboEstancia.setModel(modelo);
+        // Seleccionamos la primera estancia si existe para que se muestre su información
+        if (modelo.getSize() > 0) {
+            comboEstancia.setSelectedIndex(0);
+        }
+    }
+
     private void actualizarFecha() {
         Estancia e = (Estancia) comboEstancia.getSelectedItem();
         LocalDate nueva = dateNuevaSalida.getDate();
@@ -244,10 +275,8 @@ public class SalidaEstancia extends JDialog {
         Datos.estancias.removeIf(est -> est.getId() == e.getId());
         Datos.estancias.add(nuevaE);
 
-        // Actualiza combo
-        comboEstancia.removeItem(e);
-        comboEstancia.addItem(nuevaE);
-        comboEstancia.setSelectedItem(nuevaE);
+        // Actualiza el listado de estancias activas en el combo para reflejar los cambios
+        cargarEstanciasActivasEnCombo();
 
         // Refresca datos en UI
         actualizarInfoEstancia();
@@ -274,8 +303,8 @@ public class SalidaEstancia extends JDialog {
             Datos.estancias.removeIf(est -> est.getId() == e.getId());
             Datos.estancias.add(finalizada);
 
-            // Eliminamos del combo para liberar la plaza
-            comboEstancia.removeItem(e);
+            // Actualiza el combo con la lista de estancias activas restantes
+            cargarEstanciasActivasEnCombo();
 
             // Limpiamos los detalles de la UI
             infoEstancia.setText(" ");

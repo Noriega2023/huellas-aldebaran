@@ -60,10 +60,10 @@ public class ConsultaReservas extends JDialog {
         panelBotones.setBackground(new Color(245, 245, 245));
         panelBotones.setBorder(BorderFactory.createEmptyBorder(0, 0, 10, 10));
 
-        JButton btnRefrescar = crearBoton("Refrescar", new Color(100, 100, 100));
+        JButton btnRefrescar = crearBoton("Refrescar", new Color(70, 130, 180));
         JButton btnEliminar = crearBoton("Eliminar", new Color(200, 50, 50));
         JButton btnAplicar = crearBoton("Guardar", new Color(50, 150, 50));
-        JButton btnCerrar = crearBoton("Cerrar", new Color(70, 130, 180));
+        JButton btnCerrar = crearBoton("Cerrar", new Color(100, 100, 100));
 
         btnRefrescar.addActionListener(e -> recargar());
         btnEliminar.addActionListener(e -> eliminarSeleccion());
