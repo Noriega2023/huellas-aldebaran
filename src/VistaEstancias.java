@@ -13,8 +13,7 @@ public class VistaEstancias extends JDialog {
 
     public VistaEstancias(JFrame parent) {
         super(parent, "Panel de Estancias", true);
-        setSize(1200, 700); // Tamaño consistente con otras ventanas
-        setLocationRelativeTo(parent);
+        // No establecemos tamaño fijo aquí. Ajustaremos a pantalla completa más adelante.
         setLayout(new BorderLayout(10, 10));
         getContentPane().setBackground(new Color(240, 240, 240));
 
@@ -73,9 +72,16 @@ public class VistaEstancias extends JDialog {
 
         actualizarCuadros();
 
-        // Ajustar tamaño y comportamiento de la ventana para que conserve la estructura al redimensionar
-        pack();
-        setMinimumSize(getPreferredSize());
+        // Ajustar tamaño y comportamiento de la ventana:
+        // Hacemos que el diálogo ocupe la mayor parte de la pantalla sin
+        // superponerse a la barra de tareas u otros elementos del sistema.
+        GraphicsConfiguration gc = getGraphicsConfiguration();
+        Rectangle screenBounds = gc.getBounds();
+        Insets screenInsets = Toolkit.getDefaultToolkit().getScreenInsets(gc);
+        int width = screenBounds.width - screenInsets.left - screenInsets.right;
+        int height = screenBounds.height - screenInsets.top - screenInsets.bottom;
+        setSize(width, height);
+        setLocation(screenBounds.x + screenInsets.left, screenBounds.y + screenInsets.top);
     }
 
     private JButton crearBoton(String texto, Color color, int fontSize) {

@@ -1,6 +1,8 @@
 import com.github.lgooddatepicker.components.DatePicker;
 import com.github.lgooddatepicker.components.DatePickerSettings;
-import com.github.lgooddatepicker.components.DateChangeListener;
+// Se utiliza un DocumentListener de Swing para detectar cambios en el campo de fecha
+import javax.swing.event.DocumentListener;
+import javax.swing.event.DocumentEvent;
 import java.time.format.DateTimeFormatter;
 
 import javax.swing.*;
@@ -48,8 +50,26 @@ public class SalidaEstancia extends JDialog {
         dateNuevaSalida.setFont(fuenteCampo);
         dateNuevaSalida.setPreferredSize(new Dimension(250, 40));
 
-        // Calcular automáticamente el importe cuando cambia la fecha de salida
-        dateNuevaSalida.addDateChangeListener(event -> calcularImporte());
+        // Calcular automáticamente el importe cuando cambia la fecha de salida.
+        // Usamos un DocumentListener sobre el campo de texto interno del DatePicker
+        // para detectar cualquier modificación y recalcular el importe. De este
+        // modo evitamos depender de clases no disponibles como DateChangeListener.
+        dateNuevaSalida.getComponentDateTextField().getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                calcularImporte();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                calcularImporte();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                calcularImporte();
+            }
+        });
 
         // Etiquetas de importe y detalles
         labelImporte = new JLabel("Total a pagar: €0,00");
@@ -195,25 +215,49 @@ public class SalidaEstancia extends JDialog {
         LocalDate nueva = dateNuevaSalida.getDate();
         if (e == null || nueva == null || nueva.isBefore(e.getFechaIngreso())) return;
 
-// Actualiza en DB
+        // Mostrar confirmación antes de actualizar con botones personalizados
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String mensaje = "¿Desea actualizar la fecha de salida a " + nueva.format(formato) + "?";
+        Object[] opciones = {"Continuar", "Cancelar"};
+        int respuesta = JOptionPane.showOptionDialog(
+                this,
+                mensaje,
+                "Confirmar actualización",
+                JOptionPane.DEFAULT_OPTION,
+                JOptionPane.WARNING_MESSAGE,
+                null,
+                opciones,
+                opciones[0]
+        );
+        if (respuesta != 0) {
+            // Cancelado por el usuario, no realizar cambios
+            return;
+        }
+
+        // Actualiza en DB
         EstanciaDAO.actualizarFechaSalida(e.getId(), nueva);
 
-// Reemplaza en memoria
+        // Reemplaza en memoria con la nueva estancia
         Estancia nuevaE = new Estancia(e.getId(), e.getMascotaId(),
                 e.getFechaIngreso(), nueva, e.getPrecioDia(), e.isPagado());
         Datos.estancias.remove(e);
         Datos.estancias.add(nuevaE);
 
-// Actualiza combo
+        // Actualiza combo
         comboEstancia.removeItem(e);
         comboEstancia.addItem(nuevaE);
         comboEstancia.setSelectedItem(nuevaE);
 
-// Refresca datos en UI
+        // Refresca datos en UI
         actualizarInfoEstancia();
+
+        // Refresca la vista de estancias en tiempo real
+        if (VistaEstancias.vistaActual != null) {
+            VistaEstancias.vistaActual.actualizarCuadros();
+        }
     }
 
-        private void darSalida () {
+        private void darSalida() {
             Estancia e = (Estancia) comboEstancia.getSelectedItem();
             if (e == null) return;
 
@@ -228,14 +272,18 @@ public class SalidaEstancia extends JDialog {
                     e.getFechaIngreso(), hoy, e.getPrecioDia(), true);
             Datos.estancias.remove(e);
 
-// Elimina del combo – libera plaza
+            // Eliminamos del combo para liberar la plaza
             comboEstancia.removeItem(e);
 
-// Limpia detalles UI
+            // Limpiamos los detalles de la UI
             infoEstancia.setText(" ");
             labelImporte.setText("Total a pagar: €0.00");
 
-    }
+            // Actualizar en tiempo real la vista de estancias si está abierta
+            if (VistaEstancias.vistaActual != null) {
+                VistaEstancias.vistaActual.actualizarCuadros();
+            }
+        }
 
     /**
      * Crea una etiqueta con la fuente indicada y alineación a la derecha.

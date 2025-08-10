@@ -187,9 +187,10 @@ public class GestionMascotas extends JDialog {
                 BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
                 BorderFactory.createEmptyBorder(10, 15, 10, 15)
         ));
-        scrollObservaciones.setPreferredSize(new Dimension(600, 100));
-        scrollObservaciones.setMinimumSize(new Dimension(600, 100));
-        scrollObservaciones.setMaximumSize(new Dimension(600, 100));
+        // Ampliamos el área de observaciones para que sea más cómoda de usar
+        scrollObservaciones.setPreferredSize(new Dimension(600, 150));
+        scrollObservaciones.setMinimumSize(new Dimension(600, 150));
+        scrollObservaciones.setMaximumSize(new Dimension(600, 150));
 
         // Placeholder para observaciones
         campoObs.setText("Observaciones (opcional)");
@@ -275,6 +276,10 @@ public class GestionMascotas extends JDialog {
 
         add(panelBotones, BorderLayout.SOUTH);
         cargarDuenos();
+
+        // Ajustar tamaño y comportamiento de la ventana para que conserve la estructura al redimensionar
+        pack();
+        setMinimumSize(getPreferredSize());
     }
 
     private void buscarDuenos() {
