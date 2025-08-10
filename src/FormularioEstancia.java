@@ -144,13 +144,14 @@ public class FormularioEstancia extends JDialog {
         LocalDate hoy = LocalDate.now();
 
         for (Mascota m : lista) {
-            // Verificar si la mascota ya está en una estancia activa
+            // Verificar si la mascota ya está en una estancia activa (no pagada)
             boolean enEstancia = Datos.estancias.stream()
                     .anyMatch(e -> e.getMascotaId() == m.getId()
+                            && !e.isPagado()
                             && !hoy.isBefore(e.getFechaIngreso())
                             && !hoy.isAfter(e.getFechaSalida()));
 
-            // Solo agregar si cumple el filtro y NO está en estancia
+            // Solo agregar si cumple el filtro y NO está en estancia activa
             if (!enEstancia && (filtro.isEmpty() || m.getNombre().toLowerCase().contains(filtro.toLowerCase()))) {
                 comboMascota.addItem(m);
             }

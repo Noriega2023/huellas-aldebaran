@@ -240,7 +240,8 @@ public class SalidaEstancia extends JDialog {
         // Reemplaza en memoria con la nueva estancia
         Estancia nuevaE = new Estancia(e.getId(), e.getMascotaId(),
                 e.getFechaIngreso(), nueva, e.getPrecioDia(), e.isPagado());
-        Datos.estancias.remove(e);
+        // Eliminamos la estancia por ID para asegurar que se encuentra correctamente
+        Datos.estancias.removeIf(est -> est.getId() == e.getId());
         Datos.estancias.add(nuevaE);
 
         // Actualiza combo
@@ -267,10 +268,11 @@ public class SalidaEstancia extends JDialog {
             EstanciaDAO.actualizarFechaSalida(e.getId(), hoy);
             EstanciaDAO.actualizarPago(e.getId(), true);
 
-// Reemplaza instancia en memoria
+// Reemplaza la instancia en memoria marcándola como pagada
             Estancia finalizada = new Estancia(e.getId(), e.getMascotaId(),
                     e.getFechaIngreso(), hoy, e.getPrecioDia(), true);
-            Datos.estancias.remove(e);
+            Datos.estancias.removeIf(est -> est.getId() == e.getId());
+            Datos.estancias.add(finalizada);
 
             // Eliminamos del combo para liberar la plaza
             comboEstancia.removeItem(e);

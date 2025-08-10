@@ -30,7 +30,8 @@ public class VistaEstancias extends JDialog {
 
         // Etiqueta de estadísticas en la parte izquierda
         lblEstadisticas = new JLabel();
-        lblEstadisticas.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        // Aumentamos el tamaño de la fuente para que las estadísticas se vean más claras
+        lblEstadisticas.setFont(new Font("Segoe UI", Font.PLAIN, 18));
         lblEstadisticas.setForeground(new Color(70, 130, 180));
         panelSuperior.add(lblEstadisticas, BorderLayout.WEST);
 
@@ -43,7 +44,8 @@ public class VistaEstancias extends JDialog {
         // Fecha en la parte derecha
         JLabel lblFecha = new JLabel(LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM 'de' yyyy")),
                 SwingConstants.RIGHT);
-        lblFecha.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        // Aumentamos el tamaño de la fuente para la fecha
+        lblFecha.setFont(new Font("Segoe UI", Font.PLAIN, 18));
         panelSuperior.add(lblFecha, BorderLayout.EAST);
 
         add(panelSuperior, BorderLayout.NORTH);
@@ -70,9 +72,9 @@ public class VistaEstancias extends JDialog {
         panelBotones.setBackground(new Color(240, 240, 240));
         panelBotones.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(200, 200, 200)));
 
-        JButton btnActualizar = crearBoton("\u27F3 Actualizar", new Color(70, 130, 180), 16); // Icono de actualizar
-        JButton btnCambiarCap = crearBoton("\u2699 Cambiar Capacidad", new Color(60, 179, 113), 16); // Icono de ajustes
-        JButton btnCerrar = crearBoton("\u2716 Cerrar", new Color(100, 100, 100), 16); // Icono de cerrar
+        JButton btnActualizar = crearBoton("Actualizar", new Color(70, 130, 180), 16);
+        JButton btnCambiarCap = crearBoton("Cambiar Capacidad", new Color(60, 179, 113), 16);
+        JButton btnCerrar = crearBoton("Cerrar", new Color(100, 100, 100), 16);
 
         btnActualizar.addActionListener(e -> actualizarCuadros());
         btnCambiarCap.addActionListener(e -> cambiarCapacidad());
@@ -135,8 +137,8 @@ public class VistaEstancias extends JDialog {
         // Conjunto para evitar duplicar mascotas en estancias activas
         java.util.Set<Integer> mascotasOcupadas = new java.util.HashSet<>();
         for (Estancia e : Datos.estancias) {
-            // Incluir solamente si la estancia está activa hoy y la mascota aún no ha sido añadida
-            if (!hoy.isBefore(e.getFechaIngreso()) && !hoy.isAfter(e.getFechaSalida())) {
+            // Incluir solamente si la estancia está activa hoy, no está pagada y la mascota aún no ha sido añadida
+            if (!e.isPagado() && !hoy.isBefore(e.getFechaIngreso()) && !hoy.isAfter(e.getFechaSalida())) {
                 if (!mascotasOcupadas.contains(e.getMascotaId())) {
                     hoyActivas.add(e);
                     mascotasOcupadas.add(e.getMascotaId());
