@@ -7,30 +7,44 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class VistaEstancias extends JDialog {
-
+    // Mantiene una referencia a la instancia visible para permitir refrescos en tiempo real
+    public static VistaEstancias vistaActual;
     private JPanel grid;
     private int totalEstancias = Datos.plazasDisponibles;
 
+    // Etiqueta para mostrar estadísticas (total, ocupadas y libres)
+    private JLabel lblEstadisticas;
+
     public VistaEstancias(JFrame parent) {
         super(parent, "Panel de Estancias", true);
+        // Registrar esta instancia como la actual
+        vistaActual = this;
         // No establecemos tamaño fijo aquí. Ajustaremos a pantalla completa más adelante.
         setLayout(new BorderLayout(10, 10));
         getContentPane().setBackground(new Color(240, 240, 240));
 
-        // Panel superior con título
+        // Panel superior con estadísticas, título y fecha
         JPanel panelSuperior = new JPanel(new BorderLayout());
         panelSuperior.setBackground(new Color(240, 240, 240));
         panelSuperior.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
 
+        // Etiqueta de estadísticas en la parte izquierda
+        lblEstadisticas = new JLabel();
+        lblEstadisticas.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        lblEstadisticas.setForeground(new Color(70, 130, 180));
+        panelSuperior.add(lblEstadisticas, BorderLayout.WEST);
+
+        // Título en el centro
         JLabel lblTitulo = new JLabel("Estado de Estancias", SwingConstants.CENTER);
         lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 24));
         lblTitulo.setForeground(new Color(70, 130, 180));
         panelSuperior.add(lblTitulo, BorderLayout.CENTER);
 
+        // Fecha en la parte derecha
         JLabel lblFecha = new JLabel(LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM 'de' yyyy")),
                 SwingConstants.RIGHT);
         lblFecha.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        panelSuperior.add(lblFecha, BorderLayout.SOUTH);
+        panelSuperior.add(lblFecha, BorderLayout.EAST);
 
         add(panelSuperior, BorderLayout.NORTH);
 
@@ -108,7 +122,12 @@ public class VistaEstancias extends JDialog {
         return btn;
     }
 
-    private void actualizarCuadros() {
+    /**
+     * Actualiza la cuadrícula de estancias. Se hace pública para permitir que otras
+     * clases (por ejemplo SalidaEstancia) refresquen la vista en tiempo real tras
+     * modificar una estancia.
+     */
+    public void actualizarCuadros() {
         grid.removeAll();
 
         LocalDate hoy = LocalDate.now();
@@ -192,6 +211,15 @@ public class VistaEstancias extends JDialog {
 
         grid.revalidate();
         grid.repaint();
+
+        // Actualizar estadísticas (total, ocupadas y libres)
+        if (lblEstadisticas != null) {
+            int ocupadas = hoyActivas.size();
+            int libres = totalEstancias - ocupadas;
+            lblEstadisticas.setText(
+                    String.format("Total: %d  |  Ocupadas: %d  |  Libres: %d", totalEstancias, ocupadas, libres)
+            );
+        }
     }
 
     private void mostrarDetalleEstancia(Estancia e) {
@@ -216,12 +244,14 @@ public class VistaEstancias extends JDialog {
         // Encabezado
         JPanel panelHeader = new JPanel(new BorderLayout());
         JLabel lblTitulo = new JLabel("Detalle de Estancia");
-        lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        // Aumentamos el tamaño de fuente para que el título sea más destacado
+        lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 22));
         lblTitulo.setForeground(new Color(70, 130, 180));
         panelHeader.add(lblTitulo, BorderLayout.WEST);
 
         JLabel lblEstado = new JLabel(e.isPagado() ? "PAGADO" : "PENDIENTE");
-        lblEstado.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        // Aumentamos el tamaño de fuente de la etiqueta de estado
+        lblEstado.setFont(new Font("Segoe UI", Font.BOLD, 18));
         lblEstado.setForeground(e.isPagado() ? new Color(50, 150, 50) : new Color(200, 50, 50));
         panelHeader.add(lblEstado, BorderLayout.EAST);
 
@@ -258,11 +288,11 @@ public class VistaEstancias extends JDialog {
 
     private void agregarFila(JPanel panel, String etiqueta, String valor) {
         JLabel lblEtiqueta = new JLabel(etiqueta);
-        lblEtiqueta.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        lblEtiqueta.setFont(new Font("Segoe UI", Font.BOLD, 16));
         panel.add(lblEtiqueta);
 
         JLabel lblValor = new JLabel(valor);
-        lblValor.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        lblValor.setFont(new Font("Segoe UI", Font.PLAIN, 16));
         panel.add(lblValor);
     }
 
