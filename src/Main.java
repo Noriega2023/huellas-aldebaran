@@ -10,6 +10,9 @@ public class Main {
         // Cargar estancias desde la base de datos
         Datos.estancias = EstanciaDAO.listar();
 
+        // Cargar la capacidad de plazas desde el fichero de configuración
+        Datos.cargarCapacidad();
+
         // Registrar shutdown hook
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.out.println("Aplicación cerrada");

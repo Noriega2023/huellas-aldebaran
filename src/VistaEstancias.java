@@ -72,6 +72,10 @@ public class VistaEstancias extends JDialog {
         add(panelBotones, BorderLayout.SOUTH);
 
         actualizarCuadros();
+
+        // Ajustar tamaño y comportamiento de la ventana para que conserve la estructura al redimensionar
+        pack();
+        setMinimumSize(getPreferredSize());
     }
 
     private JButton crearBoton(String texto, Color color, int fontSize) {
@@ -103,9 +107,15 @@ public class VistaEstancias extends JDialog {
 
         LocalDate hoy = LocalDate.now();
         List<Estancia> hoyActivas = new ArrayList<>();
+        // Conjunto para evitar duplicar mascotas en estancias activas
+        java.util.Set<Integer> mascotasOcupadas = new java.util.HashSet<>();
         for (Estancia e : Datos.estancias) {
+            // Incluir solamente si la estancia está activa hoy y la mascota aún no ha sido añadida
             if (!hoy.isBefore(e.getFechaIngreso()) && !hoy.isAfter(e.getFechaSalida())) {
-                hoyActivas.add(e);
+                if (!mascotasOcupadas.contains(e.getMascotaId())) {
+                    hoyActivas.add(e);
+                    mascotasOcupadas.add(e.getMascotaId());
+                }
             }
         }
 
@@ -294,6 +304,10 @@ public class VistaEstancias extends JDialog {
 
                 totalEstancias = nuevaCapacidad;
                 Datos.plazasDisponibles = totalEstancias;
+
+                // Guardar la nueva capacidad para que se persista entre sesiones
+                Datos.guardarCapacidad();
+
                 actualizarCuadros();
 
                 JOptionPane.showMessageDialog(this,

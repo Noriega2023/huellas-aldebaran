@@ -1,5 +1,7 @@
 import com.github.lgooddatepicker.components.DatePicker;
 import com.github.lgooddatepicker.components.DatePickerSettings;
+import com.github.lgooddatepicker.components.DateChangeListener;
+import java.time.format.DateTimeFormatter;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,7 +19,7 @@ public class SalidaEstancia extends JDialog {
         // Ajustamos la ventana al finalizar la construcción con pack() para que se
         // ajuste al contenido. No establecemos un tamaño fijo para permitir el
         // redimensionado adecuado.
-        setLocationRelativeTo(parent);
+        // No establecemos la posición inicial aquí, la estableceremos al final
         setLayout(new BorderLayout(15, 15));
         // Color de fondo claro y uniforme para todo el diálogo.
         getContentPane().setBackground(new Color(240, 240, 240));
@@ -45,6 +47,9 @@ public class SalidaEstancia extends JDialog {
         dateNuevaSalida = new DatePicker(settings);
         dateNuevaSalida.setFont(fuenteCampo);
         dateNuevaSalida.setPreferredSize(new Dimension(250, 40));
+
+        // Calcular automáticamente el importe cuando cambia la fecha de salida
+        dateNuevaSalida.addDateChangeListener(event -> calcularImporte());
 
         // Etiquetas de importe y detalles
         labelImporte = new JLabel("Total a pagar: €0,00");
@@ -125,6 +130,9 @@ public class SalidaEstancia extends JDialog {
         // estructura al redimensionar
         pack();
         setMinimumSize(getPreferredSize());
+
+        // Centrar la ventana en la pantalla una vez configurada (null = centro de pantalla)
+        setLocationRelativeTo(null);
     }
 
     private JButton crearBoton(String texto, Color color) {
@@ -160,10 +168,14 @@ public class SalidaEstancia extends JDialog {
         double total = dias * e.getPrecioDia();
         labelImporte.setText(String.format("Total a pagar: €%.2f", total));
 
+        // Formateamos las fechas en formato día/mes/año
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String fechaIn = e.getFechaIngreso().format(formato);
+        String fechaOut = e.getFechaSalida().format(formato);
         infoEstancia.setText(String.format(
                 "<html>Nombre: <b>%s</b><br>Dueño: %s<br>Ingreso: %s<br>Salida prevista: %s</html>",
                 m.getNombre(), m.getDueno().getNombre(),
-                e.getFechaIngreso(), e.getFechaSalida()
+                fechaIn, fechaOut
         ));
     }
 
