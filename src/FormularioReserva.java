@@ -29,7 +29,7 @@ public class FormularioReserva extends JDialog {
         gbc.insets = new Insets(12, 12, 12, 12);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        Font fontLabel = new Font("Segoe UI", Font.BOLD, 20
+        Font fontLabel = new Font("Segoe UI", Font.BOLD, 20);
         Font fontField = new Font("Segoe UI", Font.PLAIN, 20);
 
         // Fila 0: buscador mascotas
@@ -137,7 +137,7 @@ setMinimumSize(getPreferredSize());
 
         // Aumentar tamaño del botón del calendario
         picker.getComponentToggleCalendarButton().setPreferredSize(new Dimension(40, 40));
-        picker.getComponentToggleCalendarButton().setFont(new Font("Segoe UI", Font.PLAIN, 20
+        picker.getComponentToggleCalendarButton().setFont(new Font("Segoe UI", Font.PLAIN, 20));
 
         // Aumentar tamaño del panel principal
         picker.setPreferredSize(new Dimension(250, 45));

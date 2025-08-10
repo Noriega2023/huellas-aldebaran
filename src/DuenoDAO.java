@@ -6,7 +6,6 @@ import java.util.List;
 
 public class DuenoDAO {
 
-    
 
     public static void insertar(Dueno dueno) {
         String sql = "INSERT INTO duenos (nombre, telefono, email) VALUES (?, ?, ?)";
@@ -74,9 +73,9 @@ public class DuenoDAO {
         }
     }
 
-       /**
+    /**
      * Busca un dueño por su identificador directamente en la base de datos.
-     *
+     * <p>
      * Este método evita cargar todos los dueños en memoria y realiza una
      * consulta parametrizada para encontrar el registro deseado. Devuelve
      * {@code null} si no existe ningún dueño con el ID especificado.
@@ -104,3 +103,4 @@ public class DuenoDAO {
         }
         return null;
     }
+}
