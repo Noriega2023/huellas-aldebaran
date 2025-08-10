@@ -121,10 +121,10 @@ panelBot.setBackground(new Color(240, 240, 240));
 
         for (Mascota m : lista) {
             // Verificar si la mascota ya está en una estancia activa
-            boolean enEstancia = Datos.estancias.stream()
+            boolean enEstancia = Datos.estancias.stream();
 
                             !hoy.isBefore(e.getFechaIngreso()) &&
-                            !hoy.isAfter(e.getFechaSalida()));
+                            !hoy.isAfter(e.getFechaSalida();
 
             // Solo agregar si cumple el filtro y NO está en estancia
             if (!enEstancia && (filtro.isEmpty() || m.getNombre().toLowerCase().contains(filtro.toLowerCase()))) {
